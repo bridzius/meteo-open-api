@@ -1,0 +1,357 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Meteo.lt API",
+        "version": "1.0.0",
+        "description": "Meteo.lt API allows you to use the public hydrometeorological data from the  Lithuanian Hydrometeorological Service (Lietuvos hidrometeorologijos tarnyba prie Aplinkos ministerijos). "
+    },
+    "servers": [
+        {
+            "url": "https://api.meteo.lt/v1",
+            "description": "Meteo.lt production"
+        }
+    ],
+    "paths": {
+        "/places": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Fetch a list of places with available forecasts.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "description": "Places with available forecasts.",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Place"
+                                    }
+                                },
+                                "example": [
+                                    {
+                                        "code": "abromiskes",
+                                        "name": "Abromiškės",
+                                        "administrativeDivision": "Elektrėnų savivaldybė",
+                                        "countryCode": "LT"
+                                    },
+                                    {
+                                        "code": "acokavai",
+                                        "name": "Acokavai",
+                                        "administrativeDivision": "Radviliškio rajono savivaldybė",
+                                        "countryCode": "LT"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/places/{placeCode}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Detailed information about a place.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Place"
+                                },
+                                "example": {
+                                    "code": "abromiskes",
+                                    "name": "Abromiškės",
+                                    "administrativeDivision": "Elektrėnų savivaldybė",
+                                    "country": "Lietuva",
+                                    "countryCode": "LT",
+                                    "coordinates": {
+                                        "latitude": 54.782495,
+                                        "longitude": 24.710322
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "$ref": "#/components/parameters/PlaceCode"
+                }
+            ]
+        },
+        "/places/{placeCode}/forecasts": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Get the forecast types available for the place.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "$ref": "#/components/schemas/ForecastType"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": [
+                                    {
+                                        "type": "long-term",
+                                        "description": "Long term numerical weather prediction"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "$ref": "#/components/parameters/PlaceCode"
+                }
+            ]
+        },
+        "/places/{placeCode}/forecasts/{forecastType}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Detailed forecast for the upcoming time frame",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Place"
+                                },
+                                "example": {
+                                    "place": {
+                                        "code": "abromiskes",
+                                        "name": "Abromiškės",
+                                        "administrativeDivision": "Elektrėnų savivaldybė",
+                                        "country": "Lietuva",
+                                        "countryCode": "LT",
+                                        "coordinates": {
+                                            "latitude": 54.782495,
+                                            "longitude": 24.710322
+                                        }
+                                    },
+                                    "forecastType": "long-term",
+                                    "forecastCreationTimeUtc": "2020-01-01 00:00:00",
+                                    "forecastTimestamps": [
+                                        {
+                                            "forecastTimeUtc": "2020-01-01 00:00:01",
+                                            "airTemperature": 19.5,
+                                            "windSpeed": 4,
+                                            "windGust": 8,
+                                            "windDirection": 1,
+                                            "cloudCover": 0,
+                                            "seaLevelPressure": 1020,
+                                            "relativeHumidity": 45,
+                                            "totalPrecipitation": 0,
+                                            "conditionCode": "clear"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "forecastType",
+                    "in": "path",
+                    "description": "The duration of forecast to fetch for the place",
+                    "example": "long-term",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/components/schemas/ForecastType"
+                    }
+                },
+                {
+                    "$ref": "#/components/parameters/PlaceCode"
+                }
+            ]
+        }
+    },
+    "components": {
+        "schemas": {
+            "Place": {
+                "type": "object",
+                "description": "Place, which receives a forecast",
+                "required": [
+                    "code",
+                    "name",
+                    "administrativeDivision",
+                    "countryCode"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "administrativeDivision": {
+                        "type": "string"
+                    },
+                    "countryCode": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PlaceDetailed": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Place"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "country",
+                            "coordinates"
+                        ],
+                        "properties": {
+                            "country": {
+                                "type": "string"
+                            },
+                            "coordinates": {
+                                "$ref": "#/components/schemas/Coordinates"
+                            }
+                        }
+                    }
+                ],
+                "example": {
+                    "code": "vilnius",
+                    "name": "Vilnius",
+                    "administrativeDivision": "Vilniaus miesto savivaldybė",
+                    "country": "Lietuva",
+                    "countryCode": "LT",
+                    "coordinates": {
+                        "latitude": 54.687046,
+                        "longitude": 25.282911
+                    }
+                }
+            },
+            "Coordinates": {
+                "type": "object",
+                "required": [
+                    "latitude",
+                    "longtitude"
+                ],
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "longtitude": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                }
+            },
+            "ForecastType": {
+                "type": "string",
+                "enum": [
+                    "long-term"
+                ]
+            },
+            "Forecast": {
+                "type": "object",
+                "properties": {
+                    "place": {
+                        "$ref": "#/components/schemas/PlaceDetailed"
+                    },
+                    "forecastType": {
+                        "$ref": "#/components/schemas/ForecastType"
+                    },
+                    "forecastCreationTimeUtc": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "forecastTimestamps": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ForecastTimestamp"
+                        }
+                    }
+                }
+            },
+            "ForecastTimestamp": {
+                "type": "object",
+                "properties": {
+                    "forecastTimeUtc": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "airTemperature": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "windSpeed": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "windGust": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "windDirection": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cloudCover": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "seaLevelPressure": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "relativeHumidity": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalPrecipitation": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "conditionCode": {
+                        "type": "string",
+                        "enum": [
+                            "clear",
+                            "isolated-clouds",
+                            "scattered-clouds",
+                            "overcast",
+                            "light-rain",
+                            "moderate-rain",
+                            "heavy-rain",
+                            "sleet",
+                            "light-snow",
+                            "moderate-snow",
+                            "heavy-snow",
+                            "fog",
+                            "na"
+                        ]
+                    }
+                }
+            }
+        },
+        "parameters": {
+            "PlaceCode": {
+                "name": "placeCode",
+                "in": "path",
+                "description": "The place code of the place to fetch data about.",
+                "example": "vilnius",
+                "required": true,
+                "schema": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
