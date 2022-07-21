@@ -69,6 +69,16 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "No such place exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -154,6 +164,16 @@
                                             "conditionCode": "clear"
                                         }
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No place of forecast type found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
                                 }
                             }
                         }
@@ -337,6 +357,17 @@
                             "fog",
                             "na"
                         ]
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer"
+                    },
+                    "message": {
+                        "type": "string"
                     }
                 }
             }
